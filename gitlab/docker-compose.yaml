@@ -1,0 +1,32 @@
+version: "3.5"
+services:
+
+  gitlab:
+    container_name: gitlab_gitlab
+    image: 'gitlab/gitlab-ce:latest'
+    restart: always
+    hostname: 'gitlab.example.com'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://${PUBLIC_IP}:8929'
+        registry_external_url 'http://${PUBLIC_IP}:5005'
+        gitlab_rails['gitlab_shell_ssh_port'] = 2224
+    ports:
+      - '${PUBLIC_IP}:8929:8929'
+      # - '${PUBLIC_IP}:443:443'
+      - '${PUBLIC_IP}:2224:22'
+      - '${PUBLIC_IP}:5005:5005'
+    volumes:
+      - './gitlab/config:/etc/gitlab'
+      - './gitlab/logs:/var/log/gitlab'
+      - './gitlab/data:/var/opt/gitlab'
+    networks:
+      main:
+        aliases:
+          - gitlab
+      default:
+
+networks:
+  main:
+    name: gitlab_network
+    # driver: bridge
